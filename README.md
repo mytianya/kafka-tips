@@ -6,3 +6,4 @@
 ## 已完成系列
 
 - [x] [kafka集群搭建及自启动脚本](https://www.codehome.vip/archives/kafka-kafkacluster-deploy-shell)
+
