@@ -19,8 +19,10 @@ public class KafkaSenderTest {
     }
     @Test
     public void testSend() throws InterruptedException {
+        for(int i=0;i<100;i++){
+            kafkaSender.sendAsync("TEST","","hello kafka");
+        }
         //kafkaSender.sendSync("TEST","","hello kafka");
-        kafkaSender.sendAsync("TEST","","hello kafka");
         Thread.sleep(1000);
     }
     @Test
