@@ -21,11 +21,14 @@ public class KafkaSender {
 
     public KafkaProducer getKafkaProducer(){
         Map<String,Object> confis=new HashMap<>();
-        confis.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"127.0.0.1:9092");
-        confis.put(ProducerConfig.CLIENT_ID_CONFIG,"k1");
+        confis.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"192.28.4.23:9092");
+     //   confis.put(ProducerConfig.CLIENT_ID_CONFIG,"k2");
         confis.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         confis.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,StringSerializer.class.getName());
         confis.put(ProducerConfig.ACKS_CONFIG,"all");
+        confis.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG,1000);
+        //发送重试
+
         //事务id
     //    confis.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG,"tid-1");
         //开启幂等性
@@ -59,7 +62,7 @@ public class KafkaSender {
      */
     public void sendAsync(String topicName,String key,String value){
         ProducerRecord<String,String> record= new ProducerRecord(topicName,key,value);
-       getKafkaProducer().send(record, new Callback() {
+        getKafkaProducer().send(record, new Callback() {
            @Override
            public void onCompletion(RecordMetadata recordMetadata, Exception exception) {
                if(exception==null){

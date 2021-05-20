@@ -175,4 +175,5 @@ public class KafkaReciver {
             consumer.close();
         }
     }
+
 }
