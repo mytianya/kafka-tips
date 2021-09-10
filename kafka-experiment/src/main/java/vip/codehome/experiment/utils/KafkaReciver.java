@@ -137,6 +137,28 @@ public class KafkaReciver {
             consumer.close();
         }
     }
+    public void reset(String topicName){
+        Map<String,Object> configs=new HashMap<>();
+        configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"localhost:9092");
+        configs.put(ConsumerConfig.GROUP_ID_CONFIG,"c1");
+        //是否开启自动提交
+        configs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,false);
+        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,StringDeserializer.class.getName());
+        KafkaConsumer<String,String> consumer= new KafkaConsumer<String, String>(configs);
+        consumer.subscribe(Arrays.asList(topicName));
+        Set<TopicPartition> assignment=new HashSet<>();
+        while (assignment.size()==0){
+            consumer.poll(100);
+            //获取消费者分配的分区
+            assignment=consumer.assignment();
+        }
+        for(TopicPartition topicPartition:assignment){
+            System.out.println("当前获取话题到的分区:"+topicPartition.topic()+",partition:"+topicPartition.partition());
+            //从头开始消费
+            consumer.seekToEnd(Arrays.asList(topicPartition));
+        }
+    }
     /**
      * 指定消费offset位置
      */

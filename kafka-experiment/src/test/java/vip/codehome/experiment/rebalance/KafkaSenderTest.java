@@ -20,7 +20,7 @@ public class KafkaSenderTest {
     @Test
     public void testSend() throws InterruptedException {
         for(int i=0;i<100000;i++){
-            kafkaSender.sendAsync("REBALANCE_TOPIC_TEST","",String.valueOf(i));
+            kafkaSender.sendAsync("TEL","",String.valueOf(i));
         }
         //kafkaSender.sendSync("TEST","","hello kafka");
      //   Thread.sleep(1000);

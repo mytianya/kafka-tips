@@ -21,7 +21,7 @@ public class KafkaSender {
 
     public KafkaProducer getKafkaProducer(){
         Map<String,Object> confis=new HashMap<>();
-        confis.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"192.28.4.23:9092");
+        confis.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"192.28.4.35:9092");
      //   confis.put(ProducerConfig.CLIENT_ID_CONFIG,"k2");
         confis.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         confis.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,StringSerializer.class.getName());
