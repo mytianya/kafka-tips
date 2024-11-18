@@ -2,8 +2,10 @@ package vip.codehome.experiment.utils;
 
 import org.apache.kafka.clients.Metadata;
 import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -15,16 +17,19 @@ import java.util.concurrent.Future;
  * @description
  * 1. 同步发送
  * 2. 异步发送
- * 3. 事务消息
+ * 3. 幂等发布
+ * 4. 事务消息
  ***/
 public class KafkaSender {
 
     public KafkaProducer getKafkaProducer(){
         Map<String,Object> confis=new HashMap<>();
-        confis.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"192.28.4.35:9092");
+        confis.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"192.28.7.25:9092");
      //   confis.put(ProducerConfig.CLIENT_ID_CONFIG,"k2");
-        confis.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        confis.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,StringSerializer.class.getName());
+   //     confis.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        confis.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class.getName());
+      //  confis.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,StringSerializer.class.getName());
+        confis.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,ByteArraySerializer.class.getName());
         confis.put(ProducerConfig.ACKS_CONFIG,"all");
         confis.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG,1000);
         //发送重试
@@ -61,7 +66,7 @@ public class KafkaSender {
      * @param value
      */
     public void sendAsync(String topicName,String key,String value){
-        ProducerRecord<String,String> record= new ProducerRecord(topicName,key,value);
+        ProducerRecord<byte[],byte[]> record= new ProducerRecord(topicName,key.getBytes(StandardCharsets.UTF_8),value.getBytes(StandardCharsets.UTF_8));
         getKafkaProducer().send(record, new Callback() {
            @Override
            public void onCompletion(RecordMetadata recordMetadata, Exception exception) {

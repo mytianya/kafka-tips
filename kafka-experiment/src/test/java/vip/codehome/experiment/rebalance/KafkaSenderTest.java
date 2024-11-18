@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import vip.codehome.experiment.utils.KafkaSender;
 
+import java.nio.charset.StandardCharsets;
+
 /***
  * @author 道士吟诗
  * @date 2021/4/25-下午9:37
@@ -20,7 +22,7 @@ public class KafkaSenderTest {
     @Test
     public void testSend() throws InterruptedException {
         for(int i=0;i<100000;i++){
-            kafkaSender.sendAsync("TEL","",String.valueOf(i));
+            kafkaSender.sendAsync("CUSTOM_RAWDATA_AWOS","","hello world");
         }
         //kafkaSender.sendSync("TEST","","hello kafka");
      //   Thread.sleep(1000);

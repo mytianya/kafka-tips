@@ -23,4 +23,8 @@ public class KafkaReciverTest {
     public void testRecvPartition(){
         kafkaReciver.recvPartition("TEST");
     }
+    @Test
+    public void testRecvPoll(){
+        kafkaReciver.recvManualCommit("test_replica");
+    }
 }

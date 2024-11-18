@@ -11,6 +11,10 @@ import java.util.*;
  * @author 道士吟诗
  * @date 2021/4/25-下午10:50
  * @description
+ * 1. 自动提交位移
+ * 2. 手动提交位移
+ * 3. 指定分区消息
+ * 4. 指定offset消费
  ***/
 public class KafkaReciver {
     /**
@@ -42,7 +46,7 @@ public class KafkaReciver {
      */
     public void recvManualCommit(String topicName){
         Map<String,Object> configs=new HashMap<>();
-        configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"localhost:9092");
+        configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"192.28.4.35:9092");
         configs.put(ConsumerConfig.GROUP_ID_CONFIG,"c0");
         //是否开启自动提交
         configs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,false);
