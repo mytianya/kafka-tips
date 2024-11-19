@@ -9,14 +9,14 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class KafkaClientExample {
 
@@ -79,8 +79,23 @@ public class KafkaClientExample {
         ProducerRecord<byte[],byte[]> p8=new ProducerRecord<>("RECV_UAV_TRACK_FROM_UOM_V2",2,null,"81".getBytes(StandardCharsets.UTF_8));
         ProducerRecord<byte[],byte[]> p9=new ProducerRecord<>("RECV_UAV_TRACK_FROM_UOM_V2",2,null,"91".getBytes(StandardCharsets.UTF_8));
         kafkaProducer.send(p1);
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         kafkaProducer.send(p2);
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         kafkaProducer.send(p3);
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         kafkaProducer.send(p4);
         kafkaProducer.send(p5);
         kafkaProducer.send(p6);
@@ -88,7 +103,7 @@ public class KafkaClientExample {
         kafkaProducer.send(p8);
         kafkaProducer.send(p9);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -113,10 +128,46 @@ public class KafkaClientExample {
             }
         }
     }
+
+    public void getPartitionInfo(){
+        Map<String,Object> configs=new HashMap<>();
+        configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"192.28.7.25:9092");
+        configs.put(ConsumerConfig.GROUP_ID_CONFIG,"zyw-record5");
+        //是否开启自动提交
+        configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        configs.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,StringDeserializer.class.getName());
+        configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");
+        KafkaConsumer<String,String> consumer= new KafkaConsumer<String, String>(configs);
+        List<PartitionInfo> partitionInfoList=consumer.partitionsFor("RECV_UAV_TRACK_FROM_UOM_V2");
+        List<TopicPartition> topicPartitionList=new ArrayList<>();
+        for(PartitionInfo partitionInfo:partitionInfoList){
+            TopicPartition topicPartition=new TopicPartition(partitionInfo.topic(),partitionInfo.partition());
+            topicPartitionList.add(topicPartition);
+        }
+        consumer.assign(topicPartitionList);
+        for(PartitionInfo partitionInfo:partitionInfoList){
+            TopicPartition topicPartition=new TopicPartition(partitionInfo.topic(),partitionInfo.partition());
+            long lastestOffset=consumer.position(topicPartition);
+            Map<TopicPartition,Long> map=consumer.endOffsets(Collections.singleton(topicPartition));
+            long endOffset=map.get(topicPartition);
+            long backlog=Math.toIntExact(endOffset-lastestOffset);
+            System.out.println("lastestOffset:"+lastestOffset+",endOffset:"+endOffset+",backlog:"+backlog);
+        }
+    }
     public static void main(String[] args) {
         KafkaClientExample kafkaClientExample=new KafkaClientExample();
    //     kafkaClientExample.recvAutoCommit("RECV_UAV_TRACK_FROM_UOM_V1");
       //  kafkaClientExample.sendPartition();
-       kafkaClientExample.testRecvAllPartition();
+        new Thread(()->{
+            while(true){
+                kafkaClientExample.getPartitionInfo();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+        kafkaClientExample.sendPartition();
     }
 }
